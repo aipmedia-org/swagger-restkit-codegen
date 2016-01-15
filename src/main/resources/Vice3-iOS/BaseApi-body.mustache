@@ -1,0 +1,93 @@
+#import "BaseApi.h"
+#import "Error.h"
+#import "NSError+Extra.h"
+#import "NSString+Path.h"
+
+@implementation Request
+
+- (NSMutableDictionary*)pathParams
+{
+    if (_pathParams == nil)
+        _pathParams = [NSMutableDictionary dictionary];
+    return _pathParams;
+}
+
+- (NSMutableDictionary*)queryParams
+{
+    if (_queryParams == nil)
+        _queryParams = [NSMutableDictionary dictionary];
+    return _queryParams;
+}
+
+- (void)send
+{
+    void (^success)(RKObjectRequestOperation*, RKMappingResult*) = ^void(RKObjectRequestOperation* operation, RKMappingResult* mappingResult)
+    {
+        self.successBlock(self.resultType == ResultTypeOne ? operation.mappingResult.firstObject : operation.mappingResult.array);
+    };
+    void (^failure)(RKObjectRequestOperation*, NSError*) = ^void(RKObjectRequestOperation* operation, NSError* error)
+    {
+        if ([operation.error.userInfo[RKObjectMapperErrorObjectsKey] firstObject] != nil)
+        {
+            NSInteger httpCode = operation.HTTPRequestOperation.response.statusCode;
+            error = [NSError errorWithErrorObject:[operation.error.userInfo[RKObjectMapperErrorObjectsKey] firstObject] httpCode:httpCode];
+        }
+        self.errorBlock(error);
+    };
+
+    SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@Object:path:parameters:success:failure:", [self.method lowercaseString]]);
+    typedef void (*send_type)(id, SEL, ...);
+    send_type methodImplementation = (send_type)[[BaseApi objectManager] methodForSelector:selector];
+    methodImplementation([BaseApi objectManager], selector, _body, [_path pathWithParams:_pathParams], _queryParams, success, failure);
+}
+
+@end
+
+@implementation BaseApi
+
++ (void)initialize
+{
+    [super initialize];
+    RKLogConfigureByName("RestKit/Network", RKLogLevelInfo);
+    [RKObjectManager setSharedManager:[RKObjectManager managerWithBaseURL:BASE_URL]];
+}
+
++ (RKObjectManager*)objectManager
+{
+    return [RKObjectManager sharedManager];
+}
+
++ (void)addResponseDescriptorWithMapping:(RKMapping*)mapping method:(RKRequestMethod)method path:(NSString*)path
+{
+    RKResponseDescriptor* responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:mapping
+                                                                                            method:method
+                                                                                       pathPattern:[path rkPathPattern]
+                                                                                           keyPath:@""
+                                                                                       statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    [[self objectManager] addResponseDescriptor:responseDescriptor];
+    [self addErrorResponseDescriptorForPath:responseDescriptor.pathPattern];
+}
+
++ (void)addErrorResponseDescriptorForPath:(NSString*)pathPattern
+{
+    RKResponseDescriptor* errorResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:[Error objectMapping]
+                                                                                                 method:RKRequestMethodAny
+                                                                                            pathPattern:pathPattern
+                                                                                                keyPath:nil
+                                                                                            statusCodes:[self errorStatusCodes]];
+    [[self objectManager] addResponseDescriptor:errorResponseDescriptor];
+}
+
+#pragma mark -
+#pragma mark *** Private Interface ***
+#pragma mark -
+
++ (NSIndexSet*)errorStatusCodes
+{
+    NSMutableIndexSet* codes = [[NSMutableIndexSet alloc] init];
+    [codes addIndexes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
+    [codes addIndexes:RKStatusCodeIndexSetForClass(RKStatusCodeClassServerError)];
+    return codes;
+}
+
+@end

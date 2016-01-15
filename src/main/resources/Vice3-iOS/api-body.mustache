@@ -1,0 +1,39 @@
+{{#operations}}
+#import "{{classname}}.h"
+{{#imports}}#import "{{import}}.h"
+{{/imports}}
+
+@implementation {{classname}}
+
++ (void)initialize
+{
+    [super initialize];
+    {{#operation}}
+    {{#returnBaseType}}[BaseApi addResponseDescriptorWithMapping:[{{returnBaseType}} entityMapping] method:RKRequestMethod{{httpMethod}} path:@"{{path}}"];{{/returnBaseType}}{{/operation}}
+}
+
+{{#operation}}
++ (void){{nickname}}{{#allParams}}{{^secondaryParam}}With{{/secondaryParam}}{{/allParams}}{{#allParams}}{{#secondaryParam}} {{paramName}}{{/secondaryParam}}:({{{dataType}}}){{paramName}}{{^hasMore}} s{{/hasMore}}{{/allParams}}{{^allParams}}WithS{{/allParams}}uccess:(void (^)({{#returnBaseType}}{{returnType}} response{{/returnBaseType}}{{^returnBaseType}}id unused{{/returnBaseType}}))successBlock error:(void (^)(NSError* error))errorBlock
+{
+    {{#allParams}}{{#required}}if ({{paramName}} == nil) [NSException raise:@"Invalid parameter" format:@"Missing the required parameter `{{paramName}}` when calling `{{nickname}}`"];{{/required}}
+    {{/allParams}}
+
+    Request* req = [Request new];
+    req.method = @"{{httpMethod}}";
+    req.path = @"{{path}}";
+    req.resultType = ResultType{{^isListContainer}}One{{/isListContainer}}{{#isListContainer}}Many{{/isListContainer}};
+
+    {{#pathParams}}if ({{paramName}} != nil) req.pathParams[@"{{baseName}}"] = {{paramName}};
+    {{/pathParams}}
+    {{#queryParams}}if ({{paramName}} != nil) req.queryParams[@"{{baseName}}"] = {{paramName}};
+    {{/queryParams}}{{#bodyParam}}req.body = {{paramName}};{{/bodyParam}}{{^bodyParam}}{{#formParams}}{{#notFile}}
+    if ({{paramName}} != nil) req.queryParams[@"{{baseName}}"] = {{paramName}};{{/notFile}}{{#isFile}}{{/isFile}}{{/formParams}}{{/bodyParam}}
+
+    req.successBlock = successBlock;
+    req.errorBlock = errorBlock;
+    [req send];    
+}
+
+{{/operation}}
+{{/operations}}
+@end

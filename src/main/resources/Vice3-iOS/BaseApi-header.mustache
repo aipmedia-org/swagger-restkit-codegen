@@ -1,0 +1,29 @@
+#import <RestKit/RestKit.h>
+
+typedef NS_ENUM(NSInteger, ResultType) 
+{
+    ResultTypeOne,
+    ResultTypeMany
+};
+
+@interface Request : NSObject
+
+@property (nonatomic) NSString* method;
+@property (nonatomic) NSString* path;
+@property (nonatomic) NSMutableDictionary* pathParams;
+@property (nonatomic) NSMutableDictionary* queryParams;
+@property (nonatomic) id body;
+@property (nonatomic) ResultType resultType;
+@property (nonatomic, copy) void (^successBlock)(id response);
+@property (nonatomic, copy) void (^errorBlock)(NSError* error);
+
+- (void)send;
+
+@end
+
+@interface BaseApi : NSObject
+
++ (RKObjectManager*)objectManager;
++ (void)addResponseDescriptorWithMapping:(RKMapping*)mapping method:(RKRequestMethod)method path:(NSString*)path;
+
+@end

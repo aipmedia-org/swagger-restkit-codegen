@@ -1,0 +1,15 @@
+#import <CoreData/CoreData.h>
+#import <RestKit.h>
+
+@interface BaseObject : NSManagedObject
+
++ (RKObjectMapping*)objectMapping;
++ (RKRequestDescriptor*)requestDescriptor;
++ (RKEntityMapping*)entityMapping;
++ (RKManagedObjectStore*)managedStore;
+
++ (void)save;
++ (NSArray*)getEntities;
++ (NSArray*)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors;
+
+@end

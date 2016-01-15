@@ -1,0 +1,51 @@
+{{#models}}
+{{#model}}
+#import "{{classname}}.h"
+
+@implementation {{classname}}
+
+{{#vars}}@dynamic {{name}};
+{{/vars}}
+
+- (instancetype)init 
+{
+    self = [super init];
+
+    if (self != nil) 
+    {
+        // initalize property's default value, if any
+        {{#vars}}{{#defaultValue}}self.{{name}} = {{{defaultValue}}};
+        {{/defaultValue}}{{/vars}}
+    }
+
+    return self;
+}
+
++ (RKObjectMapping*)objectMapping
+{
+    RKObjectMapping* objectMapping = [RKObjectMapping mappingForClass:[self class]];
+    {{#vars}}{{^isContainer}}[objectMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isContainer}}{{#isContainer}}[objectMapping addPropertyMapping:[RK{{#isPrimitiveType}}Attribute{{/isPrimitiveType}}{{^isPrimitiveType}}Relationship{{/isPrimitiveType}}Mapping {{#isPrimitiveType}}attribute{{/isPrimitiveType}}{{^isPrimitiveType}}relationship{{/isPrimitiveType}}MappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"{{^isPrimitiveType}} withMapping:[{{complexType}} objectMapping]{{/isPrimitiveType}}]];{{/isContainer}}
+    {{/vars}}
+    return objectMapping;
+}
+
++ (RKEntityMapping*)entityMapping
+{
+    RKEntityMapping* entityMapping = [RKEntityMapping mappingForEntityForName:NSStringFromClass([self class]) inManagedObjectStore:[self managedStore]];
+    {{#vars}}{{^isContainer}}[entityMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isContainer}}{{#isContainer}}[entityMapping addPropertyMapping:[RK{{#isPrimitiveType}}Attribute{{/isPrimitiveType}}{{^isPrimitiveType}}Relationship{{/isPrimitiveType}}Mapping {{#isPrimitiveType}}attribute{{/isPrimitiveType}}{{^isPrimitiveType}}relationship{{/isPrimitiveType}}MappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"{{^isPrimitiveType}} withMapping:[{{complexType}} entityMapping]{{/isPrimitiveType}}]];{{/isContainer}}
+    {{/vars}}
+    if ([self instancesRespondToSelector:@selector(uid)])
+        entityMapping.identificationAttributes = @[@"uid"];
+    
+    return entityMapping;
+}
+
+- (NSString*)description 
+{
+    NSDictionary* dict = [RKObjectParameterization parametersWithObject:self requestDescriptor:[[self class] requestDescriptor] error:nil];
+    return [dict description];
+}
+
+{{/model}}
+@end
+{{/models}}
