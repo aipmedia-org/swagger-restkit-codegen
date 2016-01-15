@@ -1,5 +1,7 @@
 
-# Created by https://www.gitignore.io/api/osx,xcode,objective-c
+# Created by https://www.gitignore.io/api/s,osx,xcode,objective-c,java
+
+#!! ERROR: s is undefined. Use list command to see defined gitignore types !!#
 
 ### OSX ###
 .DS_Store
@@ -112,3 +114,18 @@ fastlane/screenshots
 
 ### Objective-C Patch ###
 *.xcscmblueprint
+
+
+### Java ###
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
