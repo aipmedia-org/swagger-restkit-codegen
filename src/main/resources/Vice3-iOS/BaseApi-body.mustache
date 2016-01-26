@@ -35,10 +35,9 @@
         self.errorBlock(error);
     };
 
-    SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@Object:path:parameters:success:failure:", [self.method lowercaseString]]);
-    typedef void (*send_type)(id, SEL, ...);
-    send_type methodImplementation = (send_type)[[BaseApi objectManager] methodForSelector:selector];
-    methodImplementation([BaseApi objectManager], selector, _body, [_path pathWithParams:_pathParams], _queryParams, success, failure);
+    RKObjectRequestOperation* operation = [[BaseApi objectManager] appropriateObjectRequestOperationWithObject:_body method:RKRequestMethodFromString([self.method uppercaseString]) path:[_path pathWithParams:_pathParams] parameters:_queryParams];
+    [operation setCompletionBlockWithSuccess:success failure:failure];
+    [[BaseApi objectManager] enqueueObjectRequestOperation:operation];
 }
 
 @end

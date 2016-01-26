@@ -2,24 +2,12 @@
 {{#model}}
 #import "{{classname}}.h"
 
+#import <objc/message.h>
+
 @implementation {{classname}}
 
 {{#vars}}@dynamic {{name}};
 {{/vars}}
-
-- (instancetype)init 
-{
-    self = [super init];
-
-    if (self != nil) 
-    {
-        // initalize property's default value, if any
-        {{#vars}}{{#defaultValue}}self.{{name}} = {{{defaultValue}}};
-        {{/defaultValue}}{{/vars}}
-    }
-
-    return self;
-}
 
 + (RKObjectMapping*)objectMapping
 {
@@ -34,7 +22,7 @@
     RKEntityMapping* entityMapping = [RKEntityMapping mappingForEntityForName:NSStringFromClass([self class]) inManagedObjectStore:[self managedStore]];
     {{#vars}}{{^isContainer}}[entityMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isContainer}}{{#isContainer}}[entityMapping addPropertyMapping:[RK{{#isPrimitiveType}}Attribute{{/isPrimitiveType}}{{^isPrimitiveType}}Relationship{{/isPrimitiveType}}Mapping {{#isPrimitiveType}}attribute{{/isPrimitiveType}}{{^isPrimitiveType}}relationship{{/isPrimitiveType}}MappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"{{^isPrimitiveType}} withMapping:[{{complexType}} entityMapping]{{/isPrimitiveType}}]];{{/isContainer}}
     {{/vars}}
-    if ([self instancesRespondToSelector:@selector(uid)])
+    if (class_getProperty(self, "uid"))
         entityMapping.identificationAttributes = @[@"uid"];
     
     return entityMapping;
