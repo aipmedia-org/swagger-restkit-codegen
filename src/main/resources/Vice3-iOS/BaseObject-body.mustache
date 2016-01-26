@@ -1,7 +1,14 @@
 #import "BaseObject.h"
 #import "BaseApi.h"
+#import "CoreDataManager.h"
 
 @implementation BaseObject
+
++ (void)initialize
+{
+    [super initialize];
+    [CoreDataManager setup];
+}
 
 + (RKObjectMapping*)objectMapping
 {
@@ -18,101 +25,29 @@
     return nil;
 }
 
-+ (RKManagedObjectStore*)managedStore
-{
-    if ([BaseApi objectManager].managedObjectStore == nil)
-    {
-        // Configure RestKit's Core Data stack
-        NSManagedObjectModel *managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];
-        RKManagedObjectStore *managedObjectStore = [[RKManagedObjectStore alloc] initWithManagedObjectModel:managedObjectModel];
-        [BaseApi objectManager].managedObjectStore = managedObjectStore;
-
-        // Core Data stack
-        [managedObjectStore createPersistentStoreCoordinator];
-
-        // Persistent Store
-        NSString *storePath = [RKApplicationDataDirectory() stringByAppendingPathComponent:@"db.sqlite"];
-
-        // Create the persistent store
-        NSError *error = nil;
-        NSPersistentStore *persistentStore = [managedObjectStore addSQLitePersistentStoreAtPath:storePath
-                                                                         fromSeedDatabaseAtPath:nil
-                                                                              withConfiguration:nil
-                                                                                        options:nil
-                                                                                          error:&error];
-        if (error != nil)
-        {
-            if (error.code == 134130)
-            {
-                NSLog(@"Failed to add persistent store at path %@. Probably the underlying model changed. Removing the store and creating a new one.", storePath);
-
-                NSError *error = nil;
-                if ([[NSFileManager defaultManager] removeItemAtPath:storePath
-                                                               error:&error])
-                {
-                    // ok, try again
-                    error = nil;
-                    persistentStore = [managedObjectStore addSQLitePersistentStoreAtPath:storePath
-                                                                  fromSeedDatabaseAtPath:nil
-                                                                       withConfiguration:nil
-                                                                                 options:nil
-                                                                                   error:&error];
-                }
-                else
-                {
-                    NSLog(@"Error deleting the persistent store at path %@", storePath);
-                }
-            }
-        }
-        NSAssert(persistentStore, @"Failed to add persistent store: %@", error);
-
-        [managedObjectStore createManagedObjectContexts];
-        
-        managedObjectStore.managedObjectCache = [[RKInMemoryManagedObjectCache alloc] initWithManagedObjectContext:managedObjectStore.persistentStoreManagedObjectContext];
-
-        // Set the default store shared instance
-        [RKManagedObjectStore setDefaultStore:managedObjectStore];
-    }
-    return [BaseApi objectManager].managedObjectStore;
-}
-
-+ (void)save
-{
-    if ([[[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext] hasChanges])
-    {
-        NSError *error;
-        BOOL __unused success = [[[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext] saveToPersistentStore:&error];
-        NSLog(@"Saved context with %@", success ? @"success." : error);
-    }
-}
-
 + (NSArray*)getEntities
 {
     return [self getEntitiesWithPredicate:nil sortDescriptors:nil];
 }
 
-+ (NSArray*)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors
++ (id)getFirstWithPredicate:(NSPredicate*)predicate
 {
-    NSString* entityName = NSStringFromClass([self class]);
+    return [self getEntitiesWithPredicate:predicate sortDescriptors:nil].firstObject;
+}
 
-    NSParameterAssert(entityName);
++ (id)getFirstWithUid:(NSString*)uid
+{
+    return [self getFirstWithPredicate:[NSPredicate predicateWithFormat:@"uid = %@", uid]];
+}
 
-    NSManagedObjectContext *context = [[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext];
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
-    fetchRequest.predicate = predicate;
++ (id)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors
+{
+    return [CoreDataManager getEntitiesWithName:NSStringFromClass([self class]) predicate:predicate sortDescriptors:sortDescriptors];
+}
 
-    if (sortDescriptors)
-        fetchRequest.sortDescriptors = sortDescriptors;
-
-    NSError *error = nil;
-    NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
-
-    if (error)
-    {
-        NSLog(@"Error fetching entities %@: %@", entityName, error);
-    }
-
-    return fetchedObjects;
++ (void)save
+{
+    [CoreDataManager save];
 }
 
 @end

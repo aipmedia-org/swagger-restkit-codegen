@@ -19,7 +19,7 @@
 
 + (RKEntityMapping*)entityMapping
 {
-    RKEntityMapping* entityMapping = [RKEntityMapping mappingForEntityForName:NSStringFromClass([self class]) inManagedObjectStore:[self managedStore]];
+    RKEntityMapping* entityMapping = [RKEntityMapping mappingForEntityForName:NSStringFromClass([self class]) inManagedObjectStore:[RKManagedObjectStore defaultStore]];
     {{#vars}}{{^isContainer}}[entityMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isContainer}}{{#isContainer}}[entityMapping addPropertyMapping:[RK{{#isPrimitiveType}}Attribute{{/isPrimitiveType}}{{^isPrimitiveType}}Relationship{{/isPrimitiveType}}Mapping {{#isPrimitiveType}}attribute{{/isPrimitiveType}}{{^isPrimitiveType}}relationship{{/isPrimitiveType}}MappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"{{^isPrimitiveType}} withMapping:[{{complexType}} entityMapping]{{/isPrimitiveType}}]];{{/isContainer}}
     {{/vars}}
     if (class_getProperty(self, "uid"))

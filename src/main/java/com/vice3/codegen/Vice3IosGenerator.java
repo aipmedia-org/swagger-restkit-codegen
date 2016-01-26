@@ -132,6 +132,8 @@ public class Vice3IosGenerator extends DefaultCodegen implements CodegenConfig {
         supportingFiles.add(new SupportingFile("NSError+Extra.m", apiFolder, "NSError+Extra.m"));
         supportingFiles.add(new SupportingFile("NSString+Path.h", apiFolder, "NSString+Path.h"));
         supportingFiles.add(new SupportingFile("NSString+Path.m", apiFolder, "NSString+Path.m"));
+        supportingFiles.add(new SupportingFile("CoreDataManager.h", modelsFolder, "CoreDataManager.h"));
+        supportingFiles.add(new SupportingFile("CoreDataManager.m", modelsFolder, "CoreDataManager.m"));
         supportingFiles.add(new SupportingFile("BaseObject-header.mustache", modelsFolder, classPrefix + "BaseObject.h"));
         supportingFiles.add(new SupportingFile("BaseObject-body.mustache", modelsFolder, classPrefix + "BaseObject.m"));
         supportingFiles.add(new SupportingFile("BaseApi-header.mustache", apiFolder, classPrefix + "BaseApi.h"));

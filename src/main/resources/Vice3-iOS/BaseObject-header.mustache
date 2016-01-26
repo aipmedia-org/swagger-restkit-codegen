@@ -4,12 +4,14 @@
 @interface BaseObject : NSManagedObject
 
 + (RKObjectMapping*)objectMapping;
-+ (RKRequestDescriptor*)requestDescriptor;
 + (RKEntityMapping*)entityMapping;
-+ (RKManagedObjectStore*)managedStore;
++ (RKRequestDescriptor*)requestDescriptor;
 
-+ (void)save;
 + (NSArray*)getEntities;
 + (NSArray*)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors;
++ (id)getFirstWithPredicate:(NSPredicate*)predicate;
++ (id)getFirstWithUid:(NSString*)uid;
+
++ (void)save;
 
 @end
