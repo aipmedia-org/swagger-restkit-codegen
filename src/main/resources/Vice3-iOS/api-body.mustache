@@ -26,7 +26,11 @@
     {{#pathParams}}if ({{paramName}} != nil) req.pathParams[@"{{baseName}}"] = {{paramName}};
     {{/pathParams}}
     {{#queryParams}}if ({{paramName}} != nil) req.queryParams[@"{{baseName}}"] = {{paramName}};
-    {{/queryParams}}{{#bodyParam}}req.body = {{paramName}};{{/bodyParam}}{{^bodyParam}}{{#formParams}}{{#notFile}}
+    {{/queryParams}}{{#bodyParam}}req.body = {{paramName}};
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{[[BaseApi objectManager] addRequestDescriptor:[{{dataType}} requestDescriptor]];});
+      
+{{/bodyParam}}{{^bodyParam}}{{#formParams}}{{#notFile}}
     if ({{paramName}} != nil) req.queryParams[@"{{baseName}}"] = {{paramName}};{{/notFile}}{{#isFile}}{{/isFile}}{{/formParams}}{{/bodyParam}}
 
     req.successBlock = successBlock;
