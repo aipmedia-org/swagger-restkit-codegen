@@ -8,7 +8,7 @@
 {{#model}}
 @interface {{classname}} : {{#parent}}{{{parent}}}{{/parent}}{{^parent}}{{classPrefix}}BaseObject{{/parent}}
 
-{{#vars}}@property (nonatomic) {{{ datatype }}} {{name}}; {{#description}}// {{^required}}[optional] {{/required}}{{{description}}}{{/description}}
+{{#vars}}@property (nonatomic) {{{ datatype }}} {{name}}; {{#required}}// [required] {{#description}}{{{description}}}{{/description}}{{/required}}{{^required}}{{#description}}// {{{description}}}{{/description}}{{/required}}
 {{/vars}}
 
 @end
