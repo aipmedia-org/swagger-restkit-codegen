@@ -49,4 +49,14 @@
     [CoreDataManager save];
 }
 
+- (NSDictionary*)toDictionary
+{
+    return [RKObjectParameterization parametersWithObject:self requestDescriptor:[[self class] requestDescriptor] error:nil];
+}
+
+- (NSString*)description
+{
+    return [[self toDictionary] description];
+}
+
 @end

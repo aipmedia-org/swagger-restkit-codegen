@@ -12,7 +12,7 @@
 + (RKObjectMapping*)objectMapping
 {
     RKObjectMapping* objectMapping = [RKObjectMapping mappingForClass:[self class]];
-    {{#vars}}{{^isContainer}}[objectMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isContainer}}{{#isContainer}}[objectMapping addPropertyMapping:[RK{{#isPrimitiveType}}Attribute{{/isPrimitiveType}}{{^isPrimitiveType}}Relationship{{/isPrimitiveType}}Mapping {{#isPrimitiveType}}attribute{{/isPrimitiveType}}{{^isPrimitiveType}}relationship{{/isPrimitiveType}}MappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"{{^isPrimitiveType}} withMapping:[{{complexType}} objectMapping]{{/isPrimitiveType}}]];{{/isContainer}}
+    {{#vars}}{{#isPrimitiveType}}[objectMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isPrimitiveType}}{{^isPrimitiveType}}[objectMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}" withMapping:[{{complexType}} objectMapping]]];{{/isPrimitiveType}}
     {{/vars}}
     return objectMapping;
 }
@@ -20,19 +20,13 @@
 + (RKEntityMapping*)entityMapping
 {
     RKEntityMapping* entityMapping = [RKEntityMapping mappingForEntityForName:NSStringFromClass([self class]) inManagedObjectStore:[RKManagedObjectStore defaultStore]];
-    {{#vars}}{{^isContainer}}[entityMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isContainer}}{{#isContainer}}[entityMapping addPropertyMapping:[RK{{#isPrimitiveType}}Attribute{{/isPrimitiveType}}{{^isPrimitiveType}}Relationship{{/isPrimitiveType}}Mapping {{#isPrimitiveType}}attribute{{/isPrimitiveType}}{{^isPrimitiveType}}relationship{{/isPrimitiveType}}MappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"{{^isPrimitiveType}} withMapping:[{{complexType}} entityMapping]{{/isPrimitiveType}}]];{{/isContainer}}
+    {{#vars}}{{#isPrimitiveType}}[entityMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}"]];{{/isPrimitiveType}}{{^isPrimitiveType}}[entityMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"{{baseName}}" toKeyPath:@"{{name}}" withMapping:[{{complexType}} entityMapping]]];{{/isPrimitiveType}}
     {{/vars}}
     NSString* identifier = [CoreDataManager identifierForClass:[self class]];
     if (identifier != nil)
         entityMapping.identificationAttributes = @[identifier];
     
     return entityMapping;
-}
-
-- (NSString*)description 
-{
-    NSDictionary* dict = [RKObjectParameterization parametersWithObject:self requestDescriptor:[[self class] requestDescriptor] error:nil];
-    return [dict description];
 }
 
 {{/model}}
