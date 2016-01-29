@@ -36,7 +36,10 @@
 
 + (id)getFirstWithUid:(NSString*)uid
 {
-    return [self getFirstWithPredicate:[NSPredicate predicateWithFormat:@"%@ = %@", [CoreDataManager identifierForClass:[self class]], uid]];
+    if (uid == nil)
+        return nil;
+    else
+        return [self getFirstWithPredicate:[NSPredicate predicateWithFormat:@"%K = %@", [CoreDataManager identifierForClass:[self class]], uid]];
 }
 
 + (id)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors
