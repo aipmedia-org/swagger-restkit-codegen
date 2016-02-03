@@ -37,6 +37,7 @@
 
     NSMutableURLRequest* request = [[BaseApi objectManager] requestWithObject:_body method:RKRequestMethodFromString([self.method uppercaseString]) path:[_path pathWithParams:_pathParams] parameters:_queryParams];
 
+    [request setValue:@"gzip,deflate" forHTTPHeaderField:@"Accept-Encoding"];
     [request setTimeoutInterval:300]; // set the timeout for request to 5 minutes
 
     RKManagedObjectRequestOperation* op = [[BaseApi objectManager] managedObjectRequestOperationWithRequest:request managedObjectContext:[BaseApi objectManager].managedObjectStore.mainQueueManagedObjectContext success:success failure:failure];
