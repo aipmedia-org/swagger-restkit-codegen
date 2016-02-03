@@ -47,6 +47,11 @@
     return [CoreDataManager getEntitiesWithName:NSStringFromClass([self class]) predicate:predicate sortDescriptors:sortDescriptors];
 }
 
++ (instancetype)newInDb
+{
+    return [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([self class]) inManagedObjectContext:[RKManagedObjectStore defaultStore].mainQueueManagedObjectContext];
+}
+
 + (void)save
 {
     [CoreDataManager save];
