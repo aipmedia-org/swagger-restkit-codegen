@@ -10,6 +10,7 @@
 
 @interface CoreDataManager : NSObject
 + (void)setup;
++ (void)execSqlQuery:(NSString*)query;
 + (void)save;
 + (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors;
 + (NSString*)identifierForClass:(Class)cls;

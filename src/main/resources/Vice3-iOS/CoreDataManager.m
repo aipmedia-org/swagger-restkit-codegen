@@ -13,8 +13,14 @@
 #import <CoreData.h>
 #import "BaseApi.h"
 #import <objc/message.h>
+#import <sqlite3.h>
 
 @implementation CoreDataManager
+
++ (NSString*)dbPath
+{
+    return [RKApplicationDataDirectory() stringByAppendingPathComponent:@"db.sqlite"];
+}
 
 + (void)setup
 {
@@ -30,7 +36,7 @@
     [managedObjectStore createPersistentStoreCoordinator];
 
     // Persistent Store
-    NSString *storePath = [RKApplicationDataDirectory() stringByAppendingPathComponent:@"db.sqlite"];
+    NSString *storePath = [self dbPath];
 
     // Create the persistent store
     NSError *error = nil;
@@ -71,6 +77,31 @@
 
     // Set the default store shared instance
     [RKManagedObjectStore setDefaultStore:managedObjectStore];
+}
+
++ (void)execSqlQuery:(NSString*)query
+{
+    NSString* databasePath = [RKApplicationDataDirectory() stringByAppendingPathComponent:@"db.sqlite"];;
+
+    if ([[NSFileManager defaultManager] fileExistsAtPath:databasePath])
+    {
+        sqlite3* db = nil;
+        const char* dbpath = [databasePath UTF8String];
+        if (sqlite3_open(dbpath, &db) == SQLITE_OK)
+        {
+            char* errMsg = nil;
+
+            if (sqlite3_exec(db, [query UTF8String], NULL, NULL, &errMsg) != SQLITE_OK)
+                NSLog(@"Failed to exec sql query: %s", errMsg);
+            else
+                NSLog(@"SQL query - OK!");
+
+            sqlite3_close(db);
+
+        }
+        else
+            NSLog(@"Failed to open database");
+    }
 }
 
 + (void)save
