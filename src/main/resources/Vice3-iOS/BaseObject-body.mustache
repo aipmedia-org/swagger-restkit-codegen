@@ -57,6 +57,12 @@
     [CoreDataManager save];
 }
 
+- (void)remove
+{
+    [[RKManagedObjectStore defaultStore].mainQueueManagedObjectContext deleteObject:self];
+    [[self class] save];
+}
+
 - (NSDictionary*)toDictionary
 {
     return [RKObjectParameterization parametersWithObject:self requestDescriptor:[[self class] requestDescriptor] error:nil];
