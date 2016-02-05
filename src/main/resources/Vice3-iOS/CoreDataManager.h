@@ -14,4 +14,5 @@
 + (void)save;
 + (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors;
 + (NSString*)identifierForClass:(Class)cls;
++ (NSString*)dbPath;
 @end
