@@ -8,9 +8,12 @@
 {{#model}}
 @interface {{classname}} : {{#parent}}{{{parent}}}{{/parent}}{{^parent}}{{classPrefix}}BaseObject{{/parent}}
 
-{{#vars}}@property (nonatomic) {{{ datatype }}} {{name}}; {{#required}}// [required] {{#description}}{{{description}}}{{/description}}{{/required}}{{^required}}{{#description}}// {{{description}}}{{/description}}{{/required}}
+{{#vars}}@property (nonatomic) {{#isContainer}}{{#complexType}}NSMutableOrderedSet<{{complexType}}*>*{{/complexType}}{{^complexType}}{{{ datatype }}}{{/complexType}}{{/isContainer}}{{^isContainer}}{{{ datatype }}}{{/isContainer}} {{name}}; {{#required}}// [required] {{#description}}{{{description}}}{{/description}}{{/required}}{{^required}}{{#description}}// {{{description}}}{{/description}}{{/required}}
 {{/vars}}
-
+{{#vars}}{{#isContainer}}{{#complexType}}
+- (void)add{{complexType}}:({{complexType}}*)object;
+- (void)remove{{complexType}}:({{complexType}}*)object;
+{{/complexType}}{{/isContainer}}{{/vars}}
 @end
 {{/model}}
 {{/models}}
