@@ -27,9 +27,12 @@
     };
     void (^failure)(RKObjectRequestOperation*, NSError*) = ^void(RKObjectRequestOperation* operation, NSError* error)
     {
-        if ([operation.error.userInfo[RKObjectMapperErrorObjectsKey] firstObject] != nil)
+        Error* errorObject = [operation.error.userInfo[RKObjectMapperErrorObjectsKey] firstObject];
+        if (errorObject != nil)
         {
             NSInteger httpCode = operation.HTTPRequestOperation.response.statusCode;
+            if (errorObject.code == nil)
+                errorObject.code = [@(httpCode) stringValue];
             error = [NSError errorWithErrorObject:[operation.error.userInfo[RKObjectMapperErrorObjectsKey] firstObject] httpCode:httpCode];
         }
         self.errorBlock(error);
@@ -53,6 +56,7 @@
     [super initialize];
     RKLogConfigureByName("RestKit/Network", RKLogLevelInfo);
     [RKObjectManager setSharedManager:[RKObjectManager managerWithBaseURL:BASE_URL]];
+    [self addErrorResponseDescriptor];
 }
 
 + (RKObjectManager*)objectManager
@@ -68,15 +72,14 @@
                                                                                            keyPath:@""
                                                                                        statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
     [[self objectManager] addResponseDescriptor:responseDescriptor];
-    [self addErrorResponseDescriptorForPath:responseDescriptor.pathPattern];
 }
 
-+ (void)addErrorResponseDescriptorForPath:(NSString*)pathPattern
++ (void)addErrorResponseDescriptor
 {
-    RKResponseDescriptor* errorResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:[Error objectMapping]
+    RKResponseDescriptor* errorResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:[Error entityMapping]
                                                                                                  method:RKRequestMethodAny
-                                                                                            pathPattern:pathPattern
-                                                                                                keyPath:nil
+                                                                                            pathPattern:nil
+                                                                                                keyPath:@""
                                                                                             statusCodes:[self errorStatusCodes]];
     [[self objectManager] addResponseDescriptor:errorResponseDescriptor];
 }
