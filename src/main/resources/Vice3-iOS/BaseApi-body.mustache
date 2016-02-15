@@ -50,7 +50,7 @@ NSString* const kNetworkReachabilityChangedNotification = @"NetworkReachabilityC
     [request setValue:@"gzip,deflate" forHTTPHeaderField:@"Accept-Encoding"];
     [request setTimeoutInterval:300]; // set the timeout for request to 5 minutes
 #if ENABLE_CURL_DEBUG
-    NSLog(@"\n%@\n", [self curlDebugString]);
+    NSLog(@"\n\n%@\n\n", [self curlDebugString]);
 #endif
     RKManagedObjectRequestOperation* op = [[BaseApi objectManager] managedObjectRequestOperationWithRequest:request managedObjectContext:[BaseApi objectManager].managedObjectStore.mainQueueManagedObjectContext success:success failure:failure];
     [[BaseApi objectManager] enqueueObjectRequestOperation:op];
@@ -93,12 +93,12 @@ NSString* const kNetworkReachabilityChangedNotification = @"NetworkReachabilityC
     RKLogConfigureByName("RestKit/Network", RKLogLevelInfo);
 
     RKObjectManager* manager = [RKObjectManager managerWithBaseURL:BASE_URL];
-    [RKObjectManager setSharedManager:manager];
-    [self addErrorResponseDescriptor];
-
+    manager.requestSerializationMIMEType = RKMIMETypeJSON;
     [manager.HTTPClient setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kNetworkReachabilityChangedNotification object:@(status)];
     }];
+    [RKObjectManager setSharedManager:manager];
+    [self addErrorResponseDescriptor];
 }
 
 + (RKObjectManager*)objectManager
