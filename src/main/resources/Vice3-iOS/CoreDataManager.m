@@ -94,7 +94,10 @@
             if (sqlite3_exec(db, [query UTF8String], NULL, NULL, &errMsg) != SQLITE_OK)
                 NSLog(@"Failed to exec sql query: %s", errMsg);
             else
-                NSLog(@"SQL query - OK!");
+            {
+                query = query.length > 256 ? [[query substringToIndex:256] stringByAppendingString:@"..."] : query;
+                NSLog(@"✓ SQL query: %@", query);
+            }
 
             sqlite3_close(db);
 
