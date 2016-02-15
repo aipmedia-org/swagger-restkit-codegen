@@ -19,6 +19,11 @@
     return _queryParams;
 }
 
+- (NSMutableURLRequest*)request
+{
+    return [[BaseApi objectManager] requestWithObject:_body method:RKRequestMethodFromString([self.method uppercaseString]) path:[_path pathWithParams:_pathParams] parameters:_queryParams];
+}
+
 - (void)send
 {
     void (^success)(RKObjectRequestOperation*, RKMappingResult*) = ^void(RKObjectRequestOperation* operation, RKMappingResult* mappingResult)
@@ -38,13 +43,40 @@
         self.errorBlock(error);
     };
 
-    NSMutableURLRequest* request = [[BaseApi objectManager] requestWithObject:_body method:RKRequestMethodFromString([self.method uppercaseString]) path:[_path pathWithParams:_pathParams] parameters:_queryParams];
-
+    NSMutableURLRequest* request = [self request];
     [request setValue:@"gzip,deflate" forHTTPHeaderField:@"Accept-Encoding"];
     [request setTimeoutInterval:300]; // set the timeout for request to 5 minutes
-
+#if ENABLE_CURL_DEBUG
+    NSLog(@"\n%@\n", [self curlDebugString]);
+#endif
     RKManagedObjectRequestOperation* op = [[BaseApi objectManager] managedObjectRequestOperationWithRequest:request managedObjectContext:[BaseApi objectManager].managedObjectStore.mainQueueManagedObjectContext success:success failure:failure];
     [[BaseApi objectManager] enqueueObjectRequestOperation:op];
+}
+
+- (NSString*)curlDebugString
+{
+    NSMutableURLRequest* request = [self request];
+
+    __block NSMutableString* displayString = [NSMutableString stringWithFormat:@"curl -X %@", request.HTTPMethod];
+
+    [displayString appendFormat:@" \'%@\'",  request.URL.absoluteString];
+
+    [request.allHTTPHeaderFields enumerateKeysAndObjectsUsingBlock:^(id key, id val, BOOL *stop) {
+        [displayString appendFormat:@" -H \'%@: %@\'", key, val];
+    }];
+
+    if ([request.HTTPMethod isEqualToString:@"POST"] || [request.HTTPMethod isEqualToString:@"PUT"] || [request.HTTPMethod isEqualToString:@"PATCH"])
+    {
+        NSString* option = _queryParams.count == 0 ? @"-d" : @"-F";
+        if (_body != nil)
+            [displayString appendFormat:@" -d \'%@\'", [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]];
+        else
+            [_queryParams enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                [displayString appendFormat:@" %@ \'%@=%@\'", option, key, obj];
+            }];
+    }
+    
+    return displayString;
 }
 
 @end
