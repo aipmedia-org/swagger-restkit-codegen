@@ -2,6 +2,9 @@
 #import "Error.h"
 #import "NSError+Extra.h"
 #import "NSString+Path.h"
+@import SystemConfiguration;
+
+NSString* const kNetworkReachabilityChangedNotification = @"NetworkReachabilityChangedNotification";
 
 @implementation Request
 
@@ -86,9 +89,16 @@
 + (void)initialize
 {
     [super initialize];
+
     RKLogConfigureByName("RestKit/Network", RKLogLevelInfo);
-    [RKObjectManager setSharedManager:[RKObjectManager managerWithBaseURL:BASE_URL]];
+
+    RKObjectManager* manager = [RKObjectManager managerWithBaseURL:BASE_URL];
+    [RKObjectManager setSharedManager:manager];
     [self addErrorResponseDescriptor];
+
+    [manager.HTTPClient setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNetworkReachabilityChangedNotification object:@(status)];
+    }];
 }
 
 + (RKObjectManager*)objectManager
