@@ -6,7 +6,11 @@
 + (void)initialize
 {
     [super initialize];
-    [CoreDataManager setup];
+
+    NSString* className = NSStringFromClass(self);
+    if ([className hasSuffix:@"Request"] || [className hasSuffix:@"Response"]) // temp data containers
+        if ([self getEntities].count > 0)
+            [[self class] removeAll];
 }
 
 + (RKObjectMapping*)objectMapping

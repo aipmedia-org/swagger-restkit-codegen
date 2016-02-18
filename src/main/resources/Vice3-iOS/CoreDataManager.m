@@ -14,6 +14,13 @@
 
 @implementation CoreDataManager
 
++ (void)initialize
+{
+    [super initialize];
+
+    [CoreDataManager setup];
+}
+
 + (NSString*)dbPath
 {
     return [RKApplicationDataDirectory() stringByAppendingPathComponent:@"db.sqlite"];
