@@ -21,7 +21,7 @@
 {
     NSString* path = self;
     for (NSString* key in params)
-        path = [path stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"{%@}", key] withString:params[key]];
+        path = [path stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"{%@}", key] withString:[NSString stringWithFormat:@"%@", params[key]]];
     return path;
 }
 
