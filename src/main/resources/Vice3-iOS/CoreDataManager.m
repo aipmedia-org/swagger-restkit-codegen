@@ -7,9 +7,6 @@
 //
 
 #import "CoreDataManager.h"
-#ifdef ENABLE_CUSTOMIZATION
-#import "CoreDataCustomization.h"
-#endif
 #import <CoreData.h>
 #import "BaseApi.h"
 #import <objc/message.h>
@@ -140,11 +137,7 @@
     if (class_getProperty(cls, "uid"))
         return @"uid";
     else
-#ifdef ENABLE_CUSTOMIZATION
-        return [CoreDataCustomization identifierForClass:cls];
-#else
         return nil;
-#endif
 }
 
 @end

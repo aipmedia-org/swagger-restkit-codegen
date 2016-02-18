@@ -34,7 +34,7 @@
     return [self getEntitiesWithPredicate:predicate sortDescriptors:nil].firstObject;
 }
 
-+ (id)getFirstWithUid:(NSString*)uid
++ (id)getFirstWithUid:(id)uid
 {
     if (uid == nil)
         return nil;
@@ -55,6 +55,11 @@
 + (void)save
 {
     [CoreDataManager save];
+}
+
++ (void)removeAll
+{
+    [CoreDataManager execSqlQuery:[NSString stringWithFormat:@"DELETE FROM Z%@", [NSStringFromClass([self class]) uppercaseString]]];
 }
 
 - (void)remove

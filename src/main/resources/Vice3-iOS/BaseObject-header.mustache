@@ -11,10 +11,11 @@
 + (NSArray*)getEntities;
 + (NSArray*)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors;
 + (id)getFirstWithPredicate:(NSPredicate*)predicate;
-+ (id)getFirstWithUid:(NSString*)uid;
++ (id)getFirstWithUid:(id)uid;
 
 + (instancetype)newInDb;
 + (void)save;
++ (void)removeAll;
 - (void)remove;
 
 - (NSDictionary*)toDictionary;
