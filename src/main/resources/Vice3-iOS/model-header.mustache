@@ -11,8 +11,8 @@
 {{#vars}}@property (nonatomic) {{#isContainer}}{{#complexType}}NSMutableOrderedSet<{{complexType}}*>*{{/complexType}}{{^complexType}}{{{ datatype }}}{{/complexType}}{{/isContainer}}{{^isContainer}}{{{ datatype }}}{{/isContainer}} {{name}}; {{#required}}// [required] {{#description}}{{{description}}}{{/description}}{{/required}}{{^required}}{{#description}}// {{{description}}}{{/description}}{{/required}}
 {{/vars}}
 {{#vars}}{{#isContainer}}{{#complexType}}
-- (void)add{{complexType}}:({{complexType}}*)object;
-- (void)remove{{complexType}}:({{complexType}}*)object;
+- (void){{name}}Add:({{complexType}}*)object;
+- (void){{name}}Remove:({{complexType}}*)object;
 {{/complexType}}{{/isContainer}}{{/vars}}
 @end
 {{/model}}

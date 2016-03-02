@@ -29,13 +29,13 @@
     return entityMapping;
 }
 {{#vars}}{{#isContainer}}{{#complexType}}
-- (void)add{{complexType}}:({{complexType}}*)object
+- (void){{name}}Add:({{complexType}}*)object
 {
     NSMutableOrderedSet* set = [self mutableOrderedSetValueForKey:@"{{name}}"];
     [set addObject:object];
 }
 
-- (void)remove{{complexType}}:({{complexType}}*)object
+- (void){{name}}Remove:({{complexType}}*)object
 {
     NSMutableOrderedSet* set = [self mutableOrderedSetValueForKey:@"{{name}}"];
     [set removeObject:object];    

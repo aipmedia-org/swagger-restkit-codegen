@@ -340,7 +340,7 @@ public class Vice3IosGenerator extends DefaultCodegen implements CodegenConfig {
     }
 
     public String escapeSpecialWord(String name) {
-        return "var_" + name;
+        return "v_" + name;
     }
 
     @Override
