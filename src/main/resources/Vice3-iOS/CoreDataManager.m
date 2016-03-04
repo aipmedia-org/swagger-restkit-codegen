@@ -51,7 +51,7 @@
                                                                                       error:&error];
     if (error != nil)
     {
-        if (error.code == 134130)
+        if (error.code == 134130 || error.code == 134140)
         {
             NSLog(@"Failed to add persistent store at path %@. Probably the underlying model changed. Removing the store and creating a new one.", storePath);
 
