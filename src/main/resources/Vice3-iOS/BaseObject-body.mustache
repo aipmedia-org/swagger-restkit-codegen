@@ -35,7 +35,8 @@
 
 + (id)getFirstWithPredicate:(NSPredicate*)predicate
 {
-    return [self getEntitiesWithPredicate:predicate sortDescriptors:nil].firstObject;
+    NSArray* results = [self getEntitiesWithPredicate:predicate sortDescriptors:nil isOne:YES];
+    return results.firstObject;
 }
 
 + (id)getFirstWithUid:(id)uid
@@ -48,7 +49,12 @@
 
 + (id)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors
 {
-    return [CoreDataManager getEntitiesWithName:NSStringFromClass([self class]) predicate:predicate sortDescriptors:sortDescriptors];
+    return [self getEntitiesWithPredicate:predicate sortDescriptors:sortDescriptors isOne:NO];
+}
+
++ (id)getEntitiesWithPredicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors isOne:(BOOL)isOne
+{
+    return [CoreDataManager getEntitiesWithName:NSStringFromClass([self class]) predicate:predicate sortDescriptors:sortDescriptors isOne:isOne];
 }
 
 + (instancetype)newInDb
