@@ -12,7 +12,7 @@
 + (void)setup;
 + (void)execSqlQuery:(NSString*)query;
 + (void)save;
-+ (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors isOne:(BOOL)isOne;
++ (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors fetchLimit:(NSInteger)limit fetchOffset:(NSInteger)offset;
 + (NSString*)identifierForClass:(Class)cls;
 + (NSString*)dbPath;
 @end

@@ -121,12 +121,13 @@
     }
 }
 
-+ (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors isOne:(BOOL)isOne
++ (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors fetchLimit:(NSInteger)limit fetchOffset:(NSInteger)offset
 {
     NSManagedObjectContext *context = [[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext];
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
-    if (isOne)
-        fetchRequest.fetchLimit = 1;
+    if (limit > 0)
+        fetchRequest.fetchLimit = limit;
+    fetchRequest.fetchOffset = offset;
     fetchRequest.predicate = predicate;
 
     if (sortDescriptors)
