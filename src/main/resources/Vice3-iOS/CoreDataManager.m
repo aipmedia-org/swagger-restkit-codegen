@@ -123,7 +123,11 @@
 
 + (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors fetchLimit:(NSInteger)limit fetchOffset:(NSInteger)offset
 {
-    NSManagedObjectContext *context = [[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext];
+    return [self getEntitiesWithName:entityName predicate:predicate sortDescriptors:sortDescriptors fetchLimit:limit fetchOffset:offset managedObjectContext:[[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext]];
+}
+
++ (NSArray*)getEntitiesWithName:(NSString*)entityName predicate:(NSPredicate*)predicate sortDescriptors:(NSArray*)sortDescriptors fetchLimit:(NSInteger)limit fetchOffset:(NSInteger)offset managedObjectContext:(NSManagedObjectContext*)context
+{
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
     if (limit > 0)
         fetchRequest.fetchLimit = limit;
